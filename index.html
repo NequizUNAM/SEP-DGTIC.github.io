@@ -11,7 +11,7 @@
 <body class="bg-light">
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="#">Mi Evaluación</a>
       <div class="collapse navbar-collapse">
@@ -74,13 +74,14 @@
           <option value="0">Respuesta Incorrecta (0 pts)</option>
         </select>
       </div>
-
+ 
       <!-- Botones -->
       <div class="d-flex justify-content-between">
         <button class="btn btn-primary" onclick="generarResultado()">Generar</button>
         <button class="btn btn-secondary" onclick="reiniciarFormulario()">Reiniciar</button>
       </div>
 
+      <br/>
       <!-- Resultado + botón copiar -->
       <div class="mt-4">
         <div class="d-flex align-items-start justify-content-between">
@@ -100,7 +101,7 @@
       const nombre = document.getElementById('nombre').value.trim();
       const respuestas = document.querySelectorAll('.respuesta');
       let total = 0;
-      let mensaje = `Hola ${nombre}, tus respuestas fueron:\n`;
+      let mensaje = `Hola ${nombre}:\n`;
 
       for (let i = 0; i < respuestas.length; i++) {
         const valor = respuestas[i].value;
