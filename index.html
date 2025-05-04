@@ -74,16 +74,16 @@
           <option value="0">Respuesta Incorrecta (0 pts)</option>
         </select>
       </div>
- 
+
       <!-- Botones -->
       <div class="d-flex justify-content-between">
-        <button class="btn btn-primary" onclick="generarResultado()">Generar</button>
         <button class="btn btn-secondary" onclick="reiniciarFormulario()">Reiniciar</button>
+        <button class="btn btn-primary" onclick="generarResultado()">Generar</button>
       </div>
 
-      <br/>
       <!-- Resultado + botón copiar -->
       <div class="mt-4">
+        <h3 id="totalResultado" class="text-center fw-bold text-primary"></h3>
         <div class="d-flex align-items-start justify-content-between">
           <pre id="resultado" class="mb-0 text-dark fw-bold flex-grow-1"></pre>
           <button class="btn btn-outline-secondary ms-2" title="Copiar" onclick="copiarResultado()">
@@ -101,7 +101,7 @@
       const nombre = document.getElementById('nombre').value.trim();
       const respuestas = document.querySelectorAll('.respuesta');
       let total = 0;
-      let mensaje = `Hola ${nombre}:\n`;
+      let mensaje = '';
 
       for (let i = 0; i < respuestas.length; i++) {
         const valor = respuestas[i].value;
@@ -115,8 +115,8 @@
         mensaje += `Pregunta ${i + 1}: ${textoRespuesta}\n`;
       }
 
-      mensaje += `Total: ${total} puntos`;
-      document.getElementById('resultado').innerText = mensaje;
+      document.getElementById('totalResultado').innerText = `Total: ${total} puntos`;
+      document.getElementById('resultado').innerText = `Hola ${nombre}:\n` + mensaje;
       document.getElementById('mensajeCopiado').classList.add('d-none');
     }
 
@@ -124,6 +124,7 @@
       document.getElementById('nombre').value = '';
       document.querySelectorAll('.respuesta').forEach(select => select.value = '');
       document.getElementById('resultado').innerText = '';
+      document.getElementById('totalResultado').innerText = '';
       document.getElementById('mensajeCopiado').classList.add('d-none');
     }
 
@@ -133,7 +134,8 @@
         alert("No hay nada que copiar.");
         return;
       }
-      navigator.clipboard.writeText(texto)
+
+      navigator.clipboard.writeText(texto.trim())
         .then(() => {
           const mensaje = document.getElementById('mensajeCopiado');
           mensaje.classList.remove('d-none');
