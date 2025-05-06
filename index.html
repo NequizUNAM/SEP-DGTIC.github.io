@@ -32,6 +32,16 @@
         max-height: 200px;
         overflow-y: auto;
       }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+    }
+    .editor_atto_content {
+      min-height: 150px;
+      height: 150px;
+    }
     }
   </style>
 </head>
@@ -62,6 +72,9 @@
       </li>
       <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-tabla-tab" data-bs-toggle="pill" data-bs-target="#pills-tabla" type="button" role="tab" aria-controls="pills-tabla" aria-selected="false">Resultados</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-evaluacion-tab" data-bs-toggle="pill" data-bs-target="#pills-evaluacion" type="button" role="tab" aria-controls="pills-evaluacion" aria-selected="false">Evaluacion</button>
       </li>
     </ul>
     <div class="tab-content" id="pills-tabContent">
@@ -167,7 +180,124 @@
             </table>
           </div>
         </div>
-      </div>
+      </div><!-- Tabla -->
+
+      <div class="tab-pane fade" id="pills-evaluacion" role="tabpanel" aria-labelledby="pills-evaluacion-tab" tabindex="0">
+        <div class="card shadow">
+        <div class="card-body">
+            <h4 class="card-title text-center mb-4">Generador de Campos para Moodle</h4>
+
+            <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Número inicial:</label>
+                <input type="number" id="inicio" class="form-control" placeholder="Ej. 6108">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Número final:</label>
+                <input type="number" id="fin" class="form-control" placeholder="Ej. 6120">
+            </div>
+            </div>
+
+            <div class="btn-row mb-4">
+            <button class="btn btn-primary" onclick="generarCampos()">Generar campos</button>
+            <button class="btn btn-warning" onclick="llenarTodos()">Llenar con 0 y 'sin entregar'</button>
+            <button class="btn btn-success" onclick="generarYGuardarScript()">Guardar y copiar script</button>
+            </div>
+
+            <form id="camposGenerados" class="row g-3"></form>
+
+            <div class="mb-3 mt-4">
+            <label for="id_assignfeedbackcomments_editoreditable" class="form-label fw-bold">
+                Comentario adicional (id_assignfeedbackcomments_editoreditable)
+            </label>
+            <div id="id_assignfeedbackcomments_editoreditable" contenteditable="true" role="textbox" spellcheck="false"
+                class="editor_atto_content form-control"
+                aria-labelledby="id_assignfeedbackcomments_editor_label"
+                style="min-height: 150px;"></div>
+            </div>
+
+            <h5 class="mt-4">Vista previa del script:</h5>
+            <pre id="previewScript" class="bg-light p-3 border rounded">// El script aparecerá aquí...</pre>
+        </div>
+        </div>
+
+        <script>
+        function generarCampos() {
+            const contenedor = document.getElementById('camposGenerados');
+            contenedor.innerHTML = '';
+            const inicio = parseInt(document.getElementById('inicio').value);
+            const fin = parseInt(document.getElementById('fin').value);
+
+            if (isNaN(inicio) || isNaN(fin) || inicio > fin) {
+            alert('Rango no válido.');
+            return;
+            }
+
+            for (let i = inicio; i <= fin; i++) {
+            const grupo = document.createElement('div');
+            grupo.className = 'col-12';
+
+            grupo.innerHTML = `
+                <div class="border rounded p-3 mb-2">
+                <label class="form-label fw-bold">Criterio ${i}</label>
+                <input type="number" id="advancedgrading-criteria-${i}-score" class="form-control mb-2" placeholder="Puntuación">
+                <textarea id="advancedgrading-criteria-${i}-remark" class="form-control" rows="2" placeholder="Comentario"></textarea>
+                </div>`;
+            contenedor.appendChild(grupo);
+            }
+
+            // Limpia el campo editable también
+            const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
+            if (editableDiv) editableDiv.innerHTML = '';
+        }
+
+        function llenarTodos() {
+            const scoreInputs = document.querySelectorAll('input[id^="advancedgrading-criteria-"][id$="-score"]');
+            const remarkInputs = document.querySelectorAll('textarea[id^="advancedgrading-criteria-"][id$="-remark"]');
+
+            scoreInputs.forEach(input => input.value = 0);
+            remarkInputs.forEach(textarea => textarea.value = "sin entregar");
+
+            const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
+            if (editableDiv) editableDiv.innerHTML = "La fecha limite de entrega fue el dia";
+        }
+
+        function generarYGuardarScript() {
+            const scoreInputs = document.querySelectorAll('input[id^="advancedgrading-criteria-"][id$="-score"]');
+            const remarkInputs = document.querySelectorAll('textarea[id^="advancedgrading-criteria-"][id$="-remark"]');
+
+            let script = '';
+            scoreInputs.forEach(input => {
+            const val = input.value || '';
+            script += `if (document.getElementById("${input.id}")) document.getElementById("${input.id}").value = "${val}";\n`;
+            });
+
+            remarkInputs.forEach(textarea => {
+            const val = textarea.value.replace(/"/g, '\\"') || '';
+            script += `if (document.getElementById("${textarea.id}")) document.getElementById("${textarea.id}").value = "${val}";\n`;
+            });
+
+            // Campo contenteditable
+            const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
+            if (editableDiv) {
+            const htmlContent = editableDiv.innerHTML.replace(/"/g, '\\"');
+            script += `if (document.getElementById("id_assignfeedbackcomments_editoreditable")) document.getElementById("id_assignfeedbackcomments_editoreditable").innerHTML = "${htmlContent}";\n`;
+            }
+
+            // Copiar al portapapeles
+            const tempArea = document.createElement('textarea');
+            tempArea.value = script;
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempArea);
+
+            document.getElementById('previewScript').textContent = script;
+            alert("Script copiado al portapapeles.");
+        }
+        </script>
+      </div><!-- Evaluación -->
+
     </div>
   </div>
 
@@ -304,5 +434,3 @@
   </script>
 </body>
 </html>
-
-
