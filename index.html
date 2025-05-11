@@ -155,8 +155,7 @@
                                         class="mb-0 text-dark fw-bold flex-grow-1 p-2 bg-light rounded border"
                                         style="min-height: 100px;"></pre>
                                     <button class="btn btn-outline-secondary ms-2" title="Copiar"
-                                        onclick="copiarResultado()">
-                                        <i class="bi bi-clipboard"></i>
+                                        onclick="copiarResultado()"> <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
                                 <div id="mensajeCopiado" class="text-success mt-2 text-center d-none">¡Texto copiado al
@@ -310,6 +309,9 @@
                             script += `if (document.getElementById("id_assignfeedbackcomments_editoreditable")) document.getElementById("id_assignfeedbackcomments_editoreditable").innerHTML = "${htmlContent}";\n`;
                         }
 
+                        // Agregar el scroll al script
+                        script += 'window.scrollTo({ top: 0, behavior: "smooth" });\n';
+
                         // Copiar al portapapeles
                         const tempArea = document.createElement('textarea');
                         tempArea.value = script;
@@ -321,6 +323,7 @@
                         document.getElementById('previewScript').textContent = script;
                         alert("Script copiado al portapapeles.");
                     }
+
                 </script>
             </div><!-- Evaluación -->
 
