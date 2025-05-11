@@ -1,436 +1,466 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Formulario de Evaluación</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.min.css">
-  <style>
-    @media (max-width: 576px) {
-      .card {
-        border: none !important;
-        box-shadow: none !important;
-        padding: 1rem !important;
-      }
-      body {
-        background-color: white !important;
-      }
-      .navbar-brand {
-        font-size: 1.1rem;
-      }
-      .btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.9rem;
-      }
-      #resultado {
-        font-size: 0.9rem;
-        max-height: 200px;
-        overflow-y: auto;
-      }
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: space-between;
-    }
-    .editor_atto_content {
-      min-height: 150px;
-      height: 150px;
-    }
-    }
-  </style>
-</head>
-<body class="bg-light">
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="#">Mi Evaluación</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Evaluación</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Navegación tipo pills -->
-  <div class="container py-4">
-    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pills-form-tab" data-bs-toggle="pill" data-bs-target="#pills-form" type="button" role="tab" aria-controls="pills-form" aria-selected="true">Formulario</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-tabla-tab" data-bs-toggle="pill" data-bs-target="#pills-tabla" type="button" role="tab" aria-controls="pills-tabla" aria-selected="false">Resultados</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-evaluacion-tab" data-bs-toggle="pill" data-bs-target="#pills-evaluacion" type="button" role="tab" aria-controls="pills-evaluacion" aria-selected="false">Evaluacion</button>
-      </li>
-    </ul>
-    <div class="tab-content" id="pills-tabContent">
-      <!-- Formulario -->
-      <div class="tab-pane fade show active" id="pills-form" role="tabpanel" aria-labelledby="pills-form-tab" tabindex="0">
-        <div class="row justify-content-center">
-          <div class="col-12 col-md-8 col-lg-6">
-            <div class="card shadow-sm p-3 p-md-4">
-              <h4 class="mb-3 mb-md-4 text-center">Formulario de Evaluación</h4>
-
-              <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre:</label>
-                <input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre" required>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Pregunta 1:</label>
-                <select class="form-select respuesta">
-                  <option value="">Seleccionar...</option>
-                  <option value="25">Respuesta Correcta (25 pts)</option>
-                  <option value="13">Respuesta Parcial (13 pts)</option>
-                  <option value="0">Respuesta Incorrecta (0 pts)</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Pregunta 2:</label>
-                <select class="form-select respuesta">
-                  <option value="">Seleccionar...</option>
-                  <option value="25">Respuesta Correcta (25 pts)</option>
-                  <option value="13">Respuesta Parcial (13 pts)</option>
-                  <option value="0">Respuesta Incorrecta (0 pts)</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Pregunta 3:</label>
-                <select class="form-select respuesta">
-                  <option value="">Seleccionar...</option>
-                  <option value="25">Respuesta Correcta (25 pts)</option>
-                  <option value="13">Respuesta Parcial (13 pts)</option>
-                  <option value="0">Respuesta Incorrecta (0 pts)</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Pregunta 4:</label>
-                <select class="form-select respuesta">
-                  <option value="">Seleccionar...</option>
-                  <option value="25">Respuesta Correcta (25 pts)</option>
-                  <option value="13">Respuesta Parcial (13 pts)</option>
-                  <option value="0">Respuesta Incorrecta (0 pts)</option>
-                </select>
-              </div>
-
-              <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
-                <button class="btn btn-secondary flex-grow-1" onclick="reiniciarFormulario()">Reiniciar</button>
-                <button class="btn btn-primary flex-grow-1" onclick="generarResultado()">Generar</button>
-              </div>
-
-              <div class="mt-4">
-                <h3 id="totalResultado" class="text-center fw-bold text-primary mb-3"></h3>
-                <div class="d-flex align-items-start">
-                  <pre id="resultado" class="mb-0 text-dark fw-bold flex-grow-1 p-2 bg-light rounded border" style="min-height: 100px;"></pre>
-                  <button class="btn btn-outline-secondary ms-2" title="Copiar" onclick="copiarResultado()">
-                    <i class="bi bi-clipboard"></i>
-                  </button>
-                </div>
-                <div id="mensajeCopiado" class="text-success mt-2 text-center d-none">¡Texto copiado al portapapeles!</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabla Resultados -->
-      <div class="tab-pane fade" id="pills-tabla" role="tabpanel" aria-labelledby="pills-tabla-tab" tabindex="0">
-        <div class="row mt-3">
-          <div class="col-12">
-            <h4 class="text-center mb-3">Datos Registrados</h4>
-            <h4 class="text-center mb-3">Los datos son temporales y se eliminan</h4>
-            <br/>
-            <br/>
-            <br/>
-            <div class="d-flex justify-content-center gap-2 mb-3">
-              <button class="btn btn-success" onclick="exportarCSV()">
-                <i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV
-              </button>
-              <button class="btn btn-danger" onclick="eliminarDatos()">
-                <i class="bi bi-trash"></i> Eliminar Datos
-              </button>
-            </div>
-            <table id="tablaEjemplo" class="table table-striped test-center" style="width:100%">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Pregunta 1</th>
-                  <th>Pregunta 2</th>
-                  <th>Pregunta 3</th>
-                  <th>Pregunta 4</th>
-                  <th>Total</th>
-                  <th>Opciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </div><!-- Tabla -->
-
-      <div class="tab-pane fade" id="pills-evaluacion" role="tabpanel" aria-labelledby="pills-evaluacion-tab" tabindex="0">
-        <div class="card shadow">
-        <div class="card-body">
-            <h4 class="card-title text-center mb-4">Generador de Campos para Moodle</h4>
-
-            <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Número inicial:</label>
-                <input type="number" id="inicio" class="form-control" placeholder="Ej. 6108">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Número final:</label>
-                <input type="number" id="fin" class="form-control" placeholder="Ej. 6120">
-            </div>
-            </div>
-
-            <div class="btn-row mb-4">
-            <button class="btn btn-primary" onclick="generarCampos()">Generar campos</button>
-            <button class="btn btn-warning" onclick="llenarTodos()">Llenar con 0 y 'sin entregar'</button>
-            <button class="btn btn-success" onclick="generarYGuardarScript()">Guardar y copiar script</button>
-            </div>
-
-            <form id="camposGenerados" class="row g-3"></form>
-
-            <div class="mb-3 mt-4">
-            <label for="id_assignfeedbackcomments_editoreditable" class="form-label fw-bold">
-                Comentario adicional (id_assignfeedbackcomments_editoreditable)
-            </label>
-            <div id="id_assignfeedbackcomments_editoreditable" contenteditable="true" role="textbox" spellcheck="false"
-                class="editor_atto_content form-control"
-                aria-labelledby="id_assignfeedbackcomments_editor_label"
-                style="min-height: 150px;"></div>
-            </div>
-
-            <h5 class="mt-4">Vista previa del script:</h5>
-            <pre id="previewScript" class="bg-light p-3 border rounded">// El script aparecerá aquí...</pre>
-        </div>
-        </div>
-
-        <script>
-        function generarCampos() {
-            const contenedor = document.getElementById('camposGenerados');
-            contenedor.innerHTML = '';
-            const inicio = parseInt(document.getElementById('inicio').value);
-            const fin = parseInt(document.getElementById('fin').value);
-
-            if (isNaN(inicio) || isNaN(fin) || inicio > fin) {
-            alert('Rango no válido.');
-            return;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Formulario de Evaluación</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.min.css">
+    <style>
+        @media (max-width: 576px) {
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 1rem !important;
             }
 
-            for (let i = inicio; i <= fin; i++) {
-            const grupo = document.createElement('div');
-            grupo.className = 'col-12';
+            body {
+                background-color: white !important;
+            }
 
-            grupo.innerHTML = `
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            #resultado {
+                font-size: 0.9rem;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+
+            .btn-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: space-between;
+            }
+
+            .editor_atto_content {
+                min-height: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Mi Evaluación</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Evaluación</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navegación tipo pills -->
+    <div class="container py-4">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-form-tab" data-bs-toggle="pill" data-bs-target="#pills-form"
+                    type="button" role="tab" aria-controls="pills-form" aria-selected="true">Formulario</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-tabla-tab" data-bs-toggle="pill" data-bs-target="#pills-tabla"
+                    type="button" role="tab" aria-controls="pills-tabla" aria-selected="false">Resultados</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-evaluacion-tab" data-bs-toggle="pill"
+                    data-bs-target="#pills-evaluacion" type="button" role="tab" aria-controls="pills-evaluacion"
+                    aria-selected="false">Evaluacion</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+            <!-- Formulario -->
+            <div class="tab-pane fade show active" id="pills-form" role="tabpanel" aria-labelledby="pills-form-tab"
+                tabindex="0">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8 col-lg-6">
+                        <div class="card shadow-sm p-3 p-md-4">
+                            <h4 class="mb-3 mb-md-4 text-center">Formulario de Evaluación</h4>
+
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre:</label>
+                                <input type="text" class="form-control" id="nombre" placeholder="Ingresa tu nombre"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Pregunta 1:</label>
+                                <select class="form-select respuesta">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="25">Respuesta Correcta (25 pts)</option>
+                                    <option value="13">Respuesta Parcial (13 pts)</option>
+                                    <option value="0">Respuesta Incorrecta (0 pts)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Pregunta 2:</label>
+                                <select class="form-select respuesta">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="25">Respuesta Correcta (25 pts)</option>
+                                    <option value="13">Respuesta Parcial (13 pts)</option>
+                                    <option value="0">Respuesta Incorrecta (0 pts)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Pregunta 3:</label>
+                                <select class="form-select respuesta">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="25">Respuesta Correcta (25 pts)</option>
+                                    <option value="13">Respuesta Parcial (13 pts)</option>
+                                    <option value="0">Respuesta Incorrecta (0 pts)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Pregunta 4:</label>
+                                <select class="form-select respuesta">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="25">Respuesta Correcta (25 pts)</option>
+                                    <option value="13">Respuesta Parcial (13 pts)</option>
+                                    <option value="0">Respuesta Incorrecta (0 pts)</option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
+                                <button class="btn btn-secondary flex-grow-1"
+                                    onclick="reiniciarFormulario()">Reiniciar</button>
+                                <button class="btn btn-primary flex-grow-1"
+                                    onclick="generarResultado()">Generar</button>
+                            </div>
+
+                            <div class="mt-4">
+                                <h3 id="totalResultado" class="text-center fw-bold text-primary mb-3"></h3>
+                                <div class="d-flex align-items-start">
+                                    <pre id="resultado"
+                                        class="mb-0 text-dark fw-bold flex-grow-1 p-2 bg-light rounded border"
+                                        style="min-height: 100px;"></pre>
+                                    <button class="btn btn-outline-secondary ms-2" title="Copiar"
+                                        onclick="copiarResultado()">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div id="mensajeCopiado" class="text-success mt-2 text-center d-none">¡Texto copiado al
+                                    portapapeles!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla Resultados -->
+            <div class="tab-pane fade" id="pills-tabla" role="tabpanel" aria-labelledby="pills-tabla-tab" tabindex="0">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h4 class="text-center mb-3">Datos Registrados</h4>
+                        <h4 class="text-center mb-3">Los datos son temporales y se eliminan</h4>
+                        <br />
+                        <br />
+                        <br />
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            <button class="btn btn-success" onclick="exportarCSV()">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV
+                            </button>
+                            <button class="btn btn-danger" onclick="eliminarDatos()">
+                                <i class="bi bi-trash"></i> Eliminar Datos
+                            </button>
+                        </div>
+                        <table id="tablaEjemplo" class="table table-striped test-center" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Pregunta 1</th>
+                                    <th>Pregunta 2</th>
+                                    <th>Pregunta 3</th>
+                                    <th>Pregunta 4</th>
+                                    <th>Total</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div><!-- Tabla -->
+
+            <div class="tab-pane fade" id="pills-evaluacion" role="tabpanel" aria-labelledby="pills-evaluacion-tab"
+                tabindex="0">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h4 class="card-title text-center mb-4">Generador de Campos para Moodle</h4>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Número inicial:</label>
+                                <input type="number" id="inicio" class="form-control" placeholder="Ej. 6108">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Número final:</label>
+                                <input type="number" id="fin" class="form-control" placeholder="Ej. 6120">
+                            </div>
+                        </div>
+
+                        <div class="btn-row mb-4 d-flex justify-content-center gap-2">
+                            <button class="btn btn-outline-primary" onclick="generarCampos()">Generar campos</button>
+                            <button class="btn btn-outline-warning" onclick="llenarTodos()">Llenar con 0 y 'sin
+                                entregar'</button>
+                            <button class="btn btn-outline-success" onclick="generarYGuardarScript()">Guardar y copiar
+                                script</button>
+                        </div>
+
+                        <form id="camposGenerados" class="row g-3"></form>
+
+                        <br />
+                        <br />
+                        <br />
+
+                        <div class="mb-3 mt-4">
+                            <label for="id_assignfeedbackcomments_editoreditable" class="form-label fw-bold">
+                                Comentario adicional
+                            </label>
+                            <div id="id_assignfeedbackcomments_editoreditable" contenteditable="true" role="textbox"
+                                spellcheck="false" class="editor_atto_content form-control"
+                                aria-labelledby="id_assignfeedbackcomments_editor_label" style="min-height: 150px;">
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">Vista previa del script:</h5>
+                        <pre id="previewScript" class="bg-light p-3 border rounded">// El script aparecerá aquí...</pre>
+                    </div>
+                </div>
+
+                <script>
+                    function generarCampos() {
+                        const contenedor = document.getElementById('camposGenerados');
+                        contenedor.innerHTML = '';
+                        const inicio = parseInt(document.getElementById('inicio').value);
+                        const fin = parseInt(document.getElementById('fin').value);
+
+                        if (isNaN(inicio) || isNaN(fin) || inicio > fin) {
+                            alert('Rango no válido.');
+                            return;
+                        }
+
+                        for (let i = inicio; i <= fin; i++) {
+                            const grupo = document.createElement('div');
+                            grupo.className = 'col-12';
+
+                            grupo.innerHTML = `
                 <div class="border rounded p-3 mb-2">
                 <label class="form-label fw-bold">Criterio ${i}</label>
                 <input type="number" id="advancedgrading-criteria-${i}-score" class="form-control mb-2" placeholder="Puntuación">
                 <textarea id="advancedgrading-criteria-${i}-remark" class="form-control" rows="2" placeholder="Comentario"></textarea>
                 </div>`;
-            contenedor.appendChild(grupo);
-            }
+                            contenedor.appendChild(grupo);
+                        }
 
-            // Limpia el campo editable también
-            const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
-            if (editableDiv) editableDiv.innerHTML = '';
-        }
+                        llenarTodos();
+                    }
 
-        function llenarTodos() {
-            const scoreInputs = document.querySelectorAll('input[id^="advancedgrading-criteria-"][id$="-score"]');
-            const remarkInputs = document.querySelectorAll('textarea[id^="advancedgrading-criteria-"][id$="-remark"]');
+                    function llenarTodos() {
+                        const scoreInputs = document.querySelectorAll('input[id^="advancedgrading-criteria-"][id$="-score"]');
+                        const remarkInputs = document.querySelectorAll('textarea[id^="advancedgrading-criteria-"][id$="-remark"]');
 
-            scoreInputs.forEach(input => input.value = 0);
-            remarkInputs.forEach(textarea => textarea.value = "sin entregar");
+                        scoreInputs.forEach(input => input.value = 0);
+                        remarkInputs.forEach(textarea => textarea.value = "sin entregar");
 
-            const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
-            if (editableDiv) editableDiv.innerHTML = "La fecha limite de entrega fue el dia";
-        }
+                        const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
+                        if (editableDiv) editableDiv.innerHTML = "La fecha limite de entrega fue el dia";
+                    }
 
-        function generarYGuardarScript() {
-            const scoreInputs = document.querySelectorAll('input[id^="advancedgrading-criteria-"][id$="-score"]');
-            const remarkInputs = document.querySelectorAll('textarea[id^="advancedgrading-criteria-"][id$="-remark"]');
+                    function generarYGuardarScript() {
+                        const scoreInputs = document.querySelectorAll('input[id^="advancedgrading-criteria-"][id$="-score"]');
+                        const remarkInputs = document.querySelectorAll('textarea[id^="advancedgrading-criteria-"][id$="-remark"]');
 
-            let script = '';
-            scoreInputs.forEach(input => {
-            const val = input.value || '';
-            script += `if (document.getElementById("${input.id}")) document.getElementById("${input.id}").value = "${val}";\n`;
-            });
+                        let script = '';
+                        scoreInputs.forEach(input => {
+                            const val = input.value || '';
+                            script += `if (document.getElementById("${input.id}")) document.getElementById("${input.id}").value = "${val}";\n`;
+                        });
 
-            remarkInputs.forEach(textarea => {
-            const val = textarea.value.replace(/"/g, '\\"') || '';
-            script += `if (document.getElementById("${textarea.id}")) document.getElementById("${textarea.id}").value = "${val}";\n`;
-            });
+                        remarkInputs.forEach(textarea => {
+                            const val = textarea.value.replace(/"/g, '\\"') || '';
+                            script += `if (document.getElementById("${textarea.id}")) document.getElementById("${textarea.id}").value = "${val}";\n`;
+                        });
 
-            // Campo contenteditable
-            const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
-            if (editableDiv) {
-            const htmlContent = editableDiv.innerHTML.replace(/"/g, '\\"');
-            script += `if (document.getElementById("id_assignfeedbackcomments_editoreditable")) document.getElementById("id_assignfeedbackcomments_editoreditable").innerHTML = "${htmlContent}";\n`;
-            }
+                        // Campo contenteditable
+                        const editableDiv = document.getElementById("id_assignfeedbackcomments_editoreditable");
+                        if (editableDiv) {
+                            const htmlContent = editableDiv.innerHTML.replace(/"/g, '\\"');
+                            script += `if (document.getElementById("id_assignfeedbackcomments_editoreditable")) document.getElementById("id_assignfeedbackcomments_editoreditable").innerHTML = "${htmlContent}";\n`;
+                        }
 
-            // Copiar al portapapeles
-            const tempArea = document.createElement('textarea');
-            tempArea.value = script;
-            document.body.appendChild(tempArea);
-            tempArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempArea);
+                        // Copiar al portapapeles
+                        const tempArea = document.createElement('textarea');
+                        tempArea.value = script;
+                        document.body.appendChild(tempArea);
+                        tempArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempArea);
 
-            document.getElementById('previewScript').textContent = script;
-            alert("Script copiado al portapapeles.");
-        }
-        </script>
-      </div><!-- Evaluación -->
+                        document.getElementById('previewScript').textContent = script;
+                        alert("Script copiado al portapapeles.");
+                    }
+                </script>
+            </div><!-- Evaluación -->
 
+        </div>
     </div>
-  </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.datatables.net/2.3.0/js/dataTables.min.js"></script>
-  <script>
-    let tabla;
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.0/js/dataTables.min.js"></script>
+    <script>
+        let tabla;
 
-    function generarResultado() {
-  const nombre = document.getElementById('nombre').value.trim();
-  const respuestas = document.querySelectorAll('.respuesta');
-  let total = 0;
-  let mensaje = '';
-  const fila = [nombre];
+        function generarResultado() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const respuestas = document.querySelectorAll('.respuesta');
+            let total = 0;
+            let mensaje = '';
+            const fila = [nombre];
 
-  const puntosArray = [];
+            const puntosArray = [];
 
-  for (let i = 0; i < respuestas.length; i++) {
-    const valor = respuestas[i].value;
-    if (valor === "") {
-      alert(`Selecciona un valor para la pregunta ${i + 1}`);
-      return;
-    }
-    const puntos = parseInt(valor);
-    const textoRespuesta = respuestas[i].options[respuestas[i].selectedIndex].text;
+            for (let i = 0; i < respuestas.length; i++) {
+                const valor = respuestas[i].value;
+                if (valor === "") {
+                    alert(`Selecciona un valor para la pregunta ${i + 1}`);
+                    return;
+                }
+                const puntos = parseInt(valor);
+                const textoRespuesta = respuestas[i].options[respuestas[i].selectedIndex].text;
 
-    total += puntos;
-    mensaje += `Pregunta ${i + 1}: ${textoRespuesta}\n`;
-    fila.push(puntos);
-    puntosArray.push({ texto: textoRespuesta, valor: puntos });
-  }
+                total += puntos;
+                mensaje += `Pregunta ${i + 1}: ${textoRespuesta}\n`;
+                fila.push(puntos);
+                puntosArray.push({ texto: textoRespuesta, valor: puntos });
+            }
 
-  const textoFinal = `Hola ${nombre}:\n${mensaje}`;
+            const textoFinal = `Hola ${nombre}:\n${mensaje}`;
 
-  document.getElementById('totalResultado').innerText = `Total: ${total} puntos`;
-  document.getElementById('resultado').innerText = textoFinal;
+            document.getElementById('totalResultado').innerText = `Total: ${total} puntos`;
+            document.getElementById('resultado').innerText = textoFinal;
 
-  // Copiar al portapapeles automáticamente
-  navigator.clipboard.writeText(textoFinal)
-    .then(() => {
-      const mensajeCopiado = document.getElementById('mensajeCopiado');
-      mensajeCopiado.classList.remove('d-none');
-      mensajeCopiado.classList.add('text-success');
-      setTimeout(() => mensajeCopiado.classList.add('d-none'), 2000);
-    })
-    .catch(err => {
-      alert("Error al copiar automáticamente: " + err);
-    });
+            // Copiar al portapapeles automáticamente
+            navigator.clipboard.writeText(textoFinal)
+                .then(() => {
+                    const mensajeCopiado = document.getElementById('mensajeCopiado');
+                    mensajeCopiado.classList.remove('d-none');
+                    mensajeCopiado.classList.add('text-success');
+                    setTimeout(() => mensajeCopiado.classList.add('d-none'), 2000);
+                })
+                .catch(err => {
+                    alert("Error al copiar automáticamente: " + err);
+                });
 
-  const boton = `<button class='btn btn-outline-secondary btn-sm' onclick='copiarFilaTexto("${nombre}", ${JSON.stringify(puntosArray)})'><i class="bi bi-clipboard"></i></button>`;
-  const filaFinal = [...fila, total, boton];
-  tabla.row.add(filaFinal).draw();
+            const boton = `<button class='btn btn-outline-secondary btn-sm' onclick='copiarFilaTexto("${nombre}", ${JSON.stringify(puntosArray)})'><i class="bi bi-clipboard"></i></button>`;
+            const filaFinal = [...fila, total, boton];
+            tabla.row.add(filaFinal).draw();
 
-  guardarLocalStorage();
-}
+            guardarLocalStorage();
+
+            // Desplazamiento suave al inicio del body
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
 
-    function copiarFilaTexto(nombre, respuestas) {
-      const mensaje = respuestas.map((r, i) => `Pregunta ${i + 1}: ${r.texto} (${r.valor} pts)`).join("\n");
-      const texto = `Hola ${nombre}:\n${mensaje}`;
-      navigator.clipboard.writeText(texto).then(() => alert("Resultado copiado al portapapeles."));
-    }
+        function copiarFilaTexto(nombre, respuestas) {
+            const mensaje = respuestas.map((r, i) => `Pregunta ${i + 1}: ${r.texto} (${r.valor} pts)`).join("\n");
+            const texto = `Hola ${nombre}:\n${mensaje}`;
+            navigator.clipboard.writeText(texto).then(() => alert("Resultado copiado al portapapeles."));
+        }
 
-    function reiniciarFormulario() {
-      document.getElementById('nombre').value = '';
-      document.querySelectorAll('.respuesta').forEach(select => select.value = '');
-      document.getElementById('resultado').innerText = '';
-      document.getElementById('totalResultado').innerText = '';
-      document.getElementById('mensajeCopiado').classList.add('d-none');
-    }
+        function reiniciarFormulario() {
+            document.getElementById('nombre').value = '';
+            document.querySelectorAll('.respuesta').forEach(select => select.value = '');
+            document.getElementById('resultado').innerText = '';
+            document.getElementById('totalResultado').innerText = '';
+            document.getElementById('mensajeCopiado').classList.add('d-none');
+        }
 
-    function copiarResultado() {
-      const texto = document.getElementById('resultado').innerText;
-      if (texto.trim() === "") {
-        alert("No hay nada que copiar.");
-        return;
-      }
+        function copiarResultado() {
+            const texto = document.getElementById('resultado').innerText;
+            if (texto.trim() === "") {
+                alert("No hay nada que copiar.");
+                return;
+            }
 
-      navigator.clipboard.writeText(texto.trim())
-        .then(() => {
-          const mensaje = document.getElementById('mensajeCopiado');
-          mensaje.classList.remove('d-none');
-          setTimeout(() => mensaje.classList.add('d-none'), 2000);
-        })
-        .catch(err => {
-          alert("Error al copiar: " + err);
+            navigator.clipboard.writeText(texto.trim())
+                .then(() => {
+                    const mensaje = document.getElementById('mensajeCopiado');
+                    mensaje.classList.remove('d-none');
+                    setTimeout(() => mensaje.classList.add('d-none'), 2000);
+                })
+                .catch(err => {
+                    alert("Error al copiar: " + err);
+                });
+        }
+
+        function guardarLocalStorage() {
+            const datos = tabla.rows().data().toArray();
+            localStorage.setItem('evaluaciones', JSON.stringify(datos));
+        }
+
+        function cargarLocalStorage() {
+            const datosGuardados = JSON.parse(localStorage.getItem('evaluaciones')) || [];
+            datosGuardados.forEach(fila => {
+                tabla.row.add(fila).draw();
+            });
+        }
+
+        function exportarCSV() {
+            const datos = tabla.rows().data().toArray();
+            if (datos.length === 0) {
+                alert("No hay datos para exportar.");
+                return;
+            }
+
+            let csv = "Nombre,Pregunta 1,Pregunta 2,Pregunta 3,Pregunta 4,Total\n";
+            datos.forEach(fila => {
+                csv += fila.slice(0, 6).join(",") + "\n";
+            });
+
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "resultados.csv";
+            link.click();
+        }
+
+        function eliminarDatos() {
+            if (confirm("¿Estás seguro de que deseas eliminar todos los datos?")) {
+                localStorage.removeItem('evaluaciones');
+                tabla.clear().draw();
+            }
+        }
+
+        $(document).ready(function () {
+            tabla = $('#tablaEjemplo').DataTable();
+            cargarLocalStorage();
         });
-    }
-
-    function guardarLocalStorage() {
-      const datos = tabla.rows().data().toArray();
-      localStorage.setItem('evaluaciones', JSON.stringify(datos));
-    }
-
-    function cargarLocalStorage() {
-      const datosGuardados = JSON.parse(localStorage.getItem('evaluaciones')) || [];
-      datosGuardados.forEach(fila => {
-        tabla.row.add(fila).draw();
-      });
-    }
-
-    function exportarCSV() {
-      const datos = tabla.rows().data().toArray();
-      if (datos.length === 0) {
-        alert("No hay datos para exportar.");
-        return;
-      }
-
-      let csv = "Nombre,Pregunta 1,Pregunta 2,Pregunta 3,Pregunta 4,Total\n";
-      datos.forEach(fila => {
-        csv += fila.slice(0, 6).join(",") + "\n";
-      });
-
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "resultados.csv";
-      link.click();
-    }
-
-    function eliminarDatos() {
-      if (confirm("¿Estás seguro de que deseas eliminar todos los datos?")) {
-        localStorage.removeItem('evaluaciones');
-        tabla.clear().draw();
-      }
-    }
-
-    $(document).ready(function () {
-      tabla = $('#tablaEjemplo').DataTable();
-      cargarLocalStorage();
-    });
-  </script>
+    </script>
 </body>
+
 </html>
