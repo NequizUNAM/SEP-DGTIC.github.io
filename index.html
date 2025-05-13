@@ -310,7 +310,7 @@
                         }
 
                         // Agregar el scroll al script
-                        script += 'window.scrollTo({ top: 0, behavior: "smooth" });\n';
+                        script += 'document.querySelector(".editor_atto_content_wrap")?.scrollIntoView({ behavior: "auto", block: "end" });\n';
 
                         // Copiar al portapapeles
                         const tempArea = document.createElement('textarea');
