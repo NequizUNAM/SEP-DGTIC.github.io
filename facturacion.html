@@ -1,209 +1,183 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Formulario de Evaluación</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.min.css">
-    <style>
-        @media (max-width: 576px) {
-            .card {
-                border: none !important;
-                box-shadow: none !important;
-                padding: 1rem !important;
-            }
-
-            body {
-                background-color: white !important;
-            }
-
-            .navbar-brand {
-                font-size: 1.1rem;
-            }
-
-            .btn {
-                padding: 0.375rem 0.75rem;
-                font-size: 0.9rem;
-            }
-
-            #resultado {
-                font-size: 0.9rem;
-                max-height: 200px;
-                overflow-y: auto;
-            }
-
-            .btn-row {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                justify-content: space-between;
-            }
-
-            .editor_atto_content {
-                min-height: 150px;
-                height: 150px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formulario CFDI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    @media (max-width: 576px) {
+      .card { border: none !important; box-shadow: none !important; padding: 1rem !important; }
+      body { background-color: white !important; }
+      .navbar-brand { font-size: 1.1rem; }
+      .btn { padding: 0.375rem 0.75rem; font-size: 0.9rem; }
+      #preview { font-size: 0.9rem; max-height: 200px; overflow-y: auto; }
+    }
+  </style>
 </head>
 
 <body class="bg-light">
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Mi Evaluación</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="index.html">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="facturacion.html">Factura</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-<div class="container py-5">
-  <h2 class="mb-4">Formulario CFDI con salida en JS</h2>
-
-  <form class="row g-3">
-    <!-- Solo vista de inputs con valores por defecto -->
-    <div class="col-md-6">
-      <label class="form-label">Moneda*</label>
-      <input type="text" class="form-control" value="Peso Mexicano">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">Mi Evaluación</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Factura</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <div class="col-md-6">
-      <label class="form-label">Cliente Frecuente*</label>
-      <input type="text" class="form-control" value="UNA2907227Y5">
+  <div class="container py-5">
+    <h2 class="mb-4">Formulario CFDI</h2>
+
+    <form class="row g-3">
+      <!-- Campos con ID para referencia en JS -->
+      <div class="col-md-6">
+        <label class="form-label">Moneda*</label>
+        <input id="moneda" type="text" class="form-control" value="Peso Mexicano">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Cliente Frecuente*</label>
+        <input id="cliente" type="text" class="form-control" value="UNA2907227Y5">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Código Postal</label>
+        <input id="cp" type="text" class="form-control" value="04510">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Régimen Fiscal*</label>
+        <input id="regimen" type="text" class="form-control" value="Personas Morales con Fines no Lucrativos">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Uso de CFDI</label>
+        <input id="usoCfdi" type="text" class="form-control" value="Gastos en general.">
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Descripción Detallada</label>
+        <textarea id="descripcion" class="form-control" rows="3">INTEGRAR Y ASEGURAR EL CUMPLIMIENTO DE LAS ESPECIFICACIONES TÉCNICAS DE LOS SERVICIOS ACADÉMICOS, EN MODALIDAD EN LÍNEA, ASÍ COMO REALIZAR ACLARACIONES A USUARIOS, PARA EL SISTEMA DE DESARROLLO PROFESIONAL DE CARRERA DE LA SEP. PERIODO DEL 01 de Octubre del 2024 AL 31 de Octubre del 2024</textarea>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Producto o Servicio*</label>
+        <input id="producto" type="text" class="form-control" value="86101601">
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Unidad de Medida*</label>
+        <input id="unidad" type="text" class="form-control" value="Act">
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">Cantidad*</label>
+        <input id="cantidad" type="number" class="form-control" value="1">
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">Valor Unitario*</label>
+        <input id="valor" type="number" class="form-control" value="4800">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Objeto de Impuesto*</label>
+        <select id="impuesto" class="form-select">
+          <option selected>Sí objeto de impuesto.</option>
+          <option>No objeto de impuesto.</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">IVA</label>
+        <input id="iva" type="text" class="form-control" value="10.67">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">ISR</label>
+        <input id="isr" type="text" class="form-control" value="10">
+      </div>
+
+      <div class="col-12">
+        <button type="button" class="btn btn-primary" onclick="copiarJS()">
+          <i class="bi bi-clipboard"></i> Copiar código JS al portapapeles
+        </button>
+      </div>
+    </form>
+
+    <!-- Vista previa del código generado -->
+    <div class="mt-5">
+      <h4>Vista previa del JS</h4>
+      <pre id="preview" class="bg-white p-3 border rounded" style="white-space: pre-wrap;"></pre>
     </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Código Postal</label>
-      <input type="text" class="form-control" value="04510">
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Régimen Fiscal*</label>
-      <input type="text" class="form-control" value="Personas Morales con Fines no Lucrativos">
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Uso de CFDI</label>
-      <input type="text" class="form-control" value="Gastos en general.">
-    </div>
-
-    <div class="col-12">
-      <label class="form-label">Descripción Detallada</label>
-      <textarea class="form-control" rows="3">INGRESAR DESCRIPCION DEL CURSO AQUI</textarea>
-    </div>
-
-    <div class="col-md-4">
-      <label class="form-label">Producto o Servicio*</label>
-      <input type="text" class="form-control" value="86101601">
-    </div>
-
-    <div class="col-md-4">
-      <label class="form-label">Unidad de Medida*</label>
-      <input type="text" class="form-control" value="Act">
-    </div>
-
-    <div class="col-md-2">
-      <label class="form-label">Cantidad*</label>
-      <input type="number" class="form-control" value="1">
-    </div>
-
-    <div class="col-md-2">
-      <label class="form-label">Valor Unitario*</label>
-      <input type="number" class="form-control" value="4800">
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Objeto de Impuesto*</label>
-      <select class="form-select">
-        <option selected>Sí objeto de impuesto.</option>
-        <option>No objeto de impuesto.</option>
-      </select>
-    </div>
-
-    <div class="col-md-3">
-      <label class="form-label">IVA</label>
-      <input type="text" class="form-control" value="10.67">
-    </div>
-
-    <div class="col-md-3">
-      <label class="form-label">ISR</label>
-      <input type="text" class="form-control" value="10">
-    </div>
-
-    <div class="col-12">
-      <button type="button" class="btn btn-primary" onclick="copiarJS()">Copiar código JS al portapapeles</button>
-    </div>
-  </form>
-
-  <!-- Vista previa -->
-  <div class="mt-5">
-    <h4>Vista previa del JS</h4>
-    <pre id="preview" class="bg-white p-3 border rounded" style="white-space: pre-wrap;"></pre>
   </div>
-</div>
 
-<script>
-  const codigoJS = `// Moneda*:
-$("#135textboxautocomplete32").val("Peso Mexicano");
+  <script>
+    function copiarJS() {
+      const get = id => document.getElementById(id).value;
+
+      const codigoJS = `// Moneda*:
+$("#135textboxautocomplete32").val("${get("moneda")}");
 
 // =====================================
 // Cliente Frecuente*:
-$("#135textboxautocomplete55").val("UNA2907227Y5");
+$("#135textboxautocomplete55").val("${get("cliente")}");
 // Código Postal
-$("#135textbox61").val("04510");
+$("#135textbox61").val("${get("cp")}");
 // Régimen Fiscal*:
-$("#135textboxautocomplete62").val("Personas Morales con Fines no Lucrativos");
+$("#135textboxautocomplete62").val("${get("regimen")}");
 
 //Uso de CFDI
-$("#135textboxautocomplete66").val("Gastos en general.");
+$("#135textboxautocomplete66").val("${get("usoCfdi")}");
 
 // =====================================
 // Descripción Detallada
-$("#135textboxautocomplete113").val("INTEGRAR Y ASEGURAR EL CUMPLIMIENTO DE LAS ESPECIFICACIONES TÉCNICAS DE LOS SERVICIOS ACADÉMICOS, EN MODALIDAD EN LÍNEA, ASÍ COMO REALIZAR ACLARACIONES A USUARIOS, PARA EL SISTEMA DE DESARROLLO PROFESIONAL DE CARRERA DE LA SEP. PERIODO DEL 01 de Octubre del 2024 AL 31 de Octubre del 2024");
+$("#135textboxautocomplete113").val("${get("descripcion")}");
 
 // Producto o Servicio*:   
-$("#135textboxautocomplete118").val("86101601");
+$("#135textboxautocomplete118").val("${get("producto")}");
 // Unidad de Medida*:   
-$("#135textboxautocomplete123").val("Act");
+$("#135textboxautocomplete123").val("${get("unidad")}");
 // Cantidad*:
-$("#135textbox114").val("1");
+$("#135textbox114").val("${get("cantidad")}");
 // Valor Unitario*:
-$("#135textbox119").val("4800");
+$("#135textbox119").val("${get("valor")}");
 
 // =====================================
-// Objeto de Impuesto*  -- sI OBJETO DE IMPUESTO
-$('#135select115 option:contains("Sí objeto de impuesto.")').prop('selected', true);
+// Objeto de Impuesto*
+$('#135select115 option:contains("${get("impuesto")}")').prop('selected', true);
 
 // =====================================
 // Montos
 // IVA
-$("#135textboxautocomplete169").val("10.67");
+$("#135textboxautocomplete169").val("${get("iva")}");
 //ISR
-$("#135textboxautocomplete179").val("10");`;
+$("#135textboxautocomplete179").val("${get("isr")}");`;
 
-  document.getElementById("preview").innerText = codigoJS;
+      // Mostrar en vista previa
+      document.getElementById("preview").innerText = codigoJS;
 
-  function copiarJS() {
-    navigator.clipboard.writeText(codigoJS).then(() => {
-      alert("Código JS copiado al portapapeles");
-    });
-  }
-</script>
+      // Copiar al portapapeles
+      navigator.clipboard.writeText(codigoJS).then(() => {
+        alert("Código JS copiado al portapapeles.");
+      });
+    }
 
+    // Mostrar valores por defecto al cargar
+    window.onload = copiarJS;
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
