@@ -29,8 +29,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="index.html">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="facturacion.html">Factura</a></li>
-          <li class="nav-item"><a class="nav-link" href="Contacto.html">Contacto</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
         </ul>
       </div>
     </div>
@@ -130,19 +129,17 @@
   </div>
   
   <div class="container my-5">
-  <h4>Factura Rimbrada</h4>
+  <h4>Factura Timbrada</h4>
   <iframe src="Docs/02FacturaTimbrada.pdf" width="100%" height="600px" style="border:1px solid #ccc;"></iframe>
   </div>  
 
+  </div>
   
   <script>
     function copiarJS() {
       const get = id => document.getElementById(id).value;
 
       const codigoJS = `// Moneda*:
-$("#135textboxautocomplete32").val("${get("moneda")}");
-
-// =====================================
 // Cliente Frecuente*:
 $("#135textboxautocomplete55").val("${get("cliente")}");
 // Código Postal

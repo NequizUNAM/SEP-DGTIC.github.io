@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Complemento de Pago</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    @media (max-width: 576px) {
+      .card { border: none !important; box-shadow: none !important; padding: 1rem !important; }
+      body { background-color: white !important; }
+      .navbar-brand { font-size: 1.1rem; }
+      .btn { padding: 0.375rem 0.75rem; font-size: 0.9rem; }
+      #preview { font-size: 0.9rem; max-height: 200px; overflow-y: auto; }
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">Mi Evaluación</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="facturacion.html">Factura</a></li>
+        <li class="nav-item"><a class="nav-link active" href="complemento.html">Complemento</a></li>
+        <li class="nav-item"><a class="nav-link" href="lector_xml.html">Lector XML</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <h2 class="mb-4">Complemento de Pago</h2>
+  <form class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Código Postal</label>
+      <input id="cp" type="text" class="form-control" value="04510" />
+    </div>
+
+    <div class="col-md-6">
+    <label class="form-label">Régimen Fiscal*</label>
+    <input id="regimen" type="text" class="form-control" value="Personas Morales con Fines no Lucrativos">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Total de Pago</label>
+      <input id="totalPago" type="number" class="form-control" value="9152" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">RFC Ordenante</label>
+      <input id="rfcOrdenante" type="text" class="form-control" value="BBA830831LJ2" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Nombre del Banco</label>
+      <input id="nombreBanco" type="text" class="form-control" value="BBVABANCOMERSA" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Cuenta Ordenante</label>
+      <input id="cuentaOrdenante" type="text" class="form-control" value="0445781337" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">RFC Emisor Cuenta Beneficiaria</label>
+      <input id="rfcEmisorBeneficiario" type="text" class="form-control" value="BSM970519DU8" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Cuenta Beneficiario</label>
+      <input id="cuentaBeneficiario" type="text" class="form-control" value="6744355165" />
+    </div>
+
+    <div class="col-12">
+      <button type="button" class="btn btn-primary" onclick="copiarJS()">
+        <i class="bi bi-clipboard"></i> Copiar código JS al portapapeles
+      </button>
+    </div>
+  </form>
+
+  <div class="mt-5">
+    <h4>Vista previa del JS</h4>
+    <pre id="preview" class="bg-white p-3 border rounded" style="white-space: pre-wrap;"></pre>
+  </div>
+
+  <div class="container my-5">
+    <h4>Factura Complemento</h4>
+    <iframe src="Docs/Complemento_Factura.pdf" width="100%" height="600px" style="border:1px solid #ccc;"></iframe>
+  </div>
+  
+  <div class="container my-5">
+    <h4>Complemento</h4>
+    <iframe src="Docs/Complemento-Portal.pdf" width="100%" height="600px" style="border:1px solid #ccc;"></iframe>
+  </div>
+
+</div>
+
+<script>
+  function copiarJS() {
+    const get = id => document.getElementById(id).value;
+
+    const codigoJS = `
+/**
+ * DATOS PARA GENERAR EL COMPLEMENTO DE PAGO
+ */
+
+// Codigo Postal
+$("#135textbox61").val("${get("cp")}");
+
+// Régimen Fiscal*:
+$("#135textboxautocomplete62").val("${get("regimen")}");
+
+// Total pago
+$("#156textbox24").val("${get("totalPago")}");
+
+// RFC
+$("#156textbox36").val("${get("rfcOrdenante")}");
+// NOMBRE BANCO
+$("#156textbox37").val("${get("nombreBanco")}");
+// CUENTA ORDENANTE
+$("#156textbox38").val("${get("cuentaOrdenante")}");
+
+// RFC EMISOR CUENTA BENEFICIARIA
+$("#156textbox41").val("${get("rfcEmisorBeneficiario")}");
+
+// CUENTA BENEFICIARIO
+$("#156textbox42").val("${get("cuentaBeneficiario")}");
+    `;
+
+    document.getElementById("preview").innerText = codigoJS;
+
+    navigator.clipboard.writeText(codigoJS).then(() => {
+      alert("Código JS copiado al portapapeles.");
+    });
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
