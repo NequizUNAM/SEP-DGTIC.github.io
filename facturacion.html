@@ -28,8 +28,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="index.html">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="facturacion.html">Factura</a></li>
+          <li class="nav-item"><a class="nav-link" href="complemento.html">Complemento</a></li>
+          <li class="nav-item"><a class="nav-link" href="lector_xml.html">Lector XML</a></li>
         </ul>
       </div>
     </div>
@@ -131,8 +133,6 @@
   <div class="container my-5">
   <h4>Factura Timbrada</h4>
   <iframe src="Docs/02FacturaTimbrada.pdf" width="100%" height="600px" style="border:1px solid #ccc;"></iframe>
-  </div>  
-
   </div>
   
   <script>
@@ -140,39 +140,42 @@
       const get = id => document.getElementById(id).value;
 
       const codigoJS = `// Moneda*:
-// Cliente Frecuente*:
-$("#135textboxautocomplete55").val("${get("cliente")}");
-// Código Postal
-$("#135textbox61").val("${get("cp")}");
-// Régimen Fiscal*:
-$("#135textboxautocomplete62").val("${get("regimen")}");
+      $("#135textboxautocomplete32").val("${get("moneda")}");
 
-//Uso de CFDI
-$("#135textboxautocomplete66").val("${get("usoCfdi")}");
+      // =====================================
+      // Cliente Frecuente*:
+      $("#135textboxautocomplete55").val("${get("cliente")}");
+      // Código Postal
+      $("#135textbox61").val("${get("cp")}");
+      // Régimen Fiscal*:
+      $("#135textboxautocomplete62").val("${get("regimen")}");
 
-// =====================================
-// Descripción Detallada
-$("#135textboxautocomplete113").val("${get("descripcion")}");
+      //Uso de CFDI
+      $("#135textboxautocomplete66").val("${get("usoCfdi")}");
 
-// Producto o Servicio*:   
-$("#135textboxautocomplete118").val("${get("producto")}");
-// Unidad de Medida*:   
-$("#135textboxautocomplete123").val("${get("unidad")}");
-// Cantidad*:
-$("#135textbox114").val("${get("cantidad")}");
-// Valor Unitario*:
-$("#135textbox119").val("${get("valor")}");
+      // =====================================
+      // Descripción Detallada
+      $("#135textboxautocomplete113").val("${get("descripcion")}");
 
-// =====================================
-// Objeto de Impuesto*
-$('#135select115 option:contains("${get("impuesto")}")').prop('selected', true);
+      // Producto o Servicio*:   
+      $("#135textboxautocomplete118").val("${get("producto")}");
+      // Unidad de Medida*:   
+      $("#135textboxautocomplete123").val("${get("unidad")}");
+      // Cantidad*:
+      $("#135textbox114").val("${get("cantidad")}");
+      // Valor Unitario*:
+      $("#135textbox119").val("${get("valor")}");
 
-// =====================================
-// Montos
-// IVA
-$("#135textboxautocomplete169").val("${get("iva")}");
-//ISR
-$("#135textboxautocomplete179").val("${get("isr")}");`;
+      // =====================================
+      // Objeto de Impuesto*
+      $('#135select115 option:contains("${get("impuesto")}")').prop('selected', true);
+
+      // =====================================
+      // Montos
+      // IVA
+      $("#135textboxautocomplete169").val("${get("iva")}");
+      //ISR
+      $("#135textboxautocomplete179").val("${get("isr")}");`;
 
       // Mostrar en vista previa
       document.getElementById("preview").innerText = codigoJS;
