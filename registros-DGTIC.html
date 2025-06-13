@@ -3,8 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Formulario Zoom con Estado</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- DataTables CSS -->
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+  <!-- SheetJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
   <style>
     .visitado {
       color: blue;
@@ -27,7 +35,7 @@
     </table>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal para mostrar el JS -->
   <div class="modal fade" id="modalScript" tabindex="-1" aria-labelledby="modalScriptLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
@@ -53,14 +61,19 @@
     </div>
   </div>
 
+  <!-- Bootstrap JS + DataTables -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       cargarDatosDesdeExcel();
     });
 
     async function cargarDatosDesdeExcel() {
-      const response = await fetch('Docs/datos_zoom.xlsx');
+      const response = await fetch('datos_zoom.xlsx');
       const arrayBuffer = await response.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -108,9 +121,19 @@
         const estadoCell = document.createElement('td');
         estadoCell.textContent = estadoVisitado(persona.URL) ? 'Visitado' : 'Pendiente';
         estadoCell.id = `estado_${persona.Folio}`;
+        if (estadoVisitado(persona.URL)) {
+          estadoCell.classList.add('bg-success-subtle');
+        }
         fila.appendChild(estadoCell);
 
         tbody.appendChild(fila);
+      });
+
+      // Inicializar DataTable una vez cargados los datos
+      $('#tabla').DataTable({
+        language: {
+          url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+        }
       });
     }
 
@@ -138,9 +161,10 @@ document.querySelector('#question_email').value = '${persona.Correo}';`;
           }
         }, 500);
 
-        // Marca como visitado en UI
+        // Marcar como visitado
         localStorage.setItem('visitado_' + persona.URL, 'true');
         document.getElementById(`estado_${persona.Folio}`).textContent = 'Visitado';
+        document.getElementById(`estado_${persona.Folio}`).classList.add('bg-success-subtle');
         document.getElementById(`url_${persona.Folio}`).classList.add('visitado');
 
       } catch (err) {
