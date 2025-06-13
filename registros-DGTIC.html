@@ -51,6 +51,11 @@
     </div>
   </div>
 
+  <!-- Botón de descarga -->
+  <button id="btnDescargar" class="btn btn-outline-success mb-3">
+    <i class="bi bi-download me-1"></i>Descargar Registros
+  </button>
+
   <!-- Card de tabla de datos -->
   <div class="card shadow-sm">
     <div class="card-body">
@@ -66,69 +71,70 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  document.getElementById('fileInput').addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  let registros = [];
+
+  document.getElementById('fileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0]; if (!file) return;
     if (file.size > 300 * 1024 * 1024) {
-      alert('El archivo excede el tamaño máximo de 300MB. Por favor selecciona uno más pequeño.');
-      event.target.value = '';
-      return;
+      alert('El archivo excede el tamaño máximo de 300MB.'); e.target.value = ''; return;
     }
-    const arrayBuffer = await file.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const datos = XLSX.utils.sheet_to_json(sheet);
-    mostrarTabla(datos);
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+    // Asegurar columna Status
+    data.forEach(r => { if (!('Status' in r)) r.Status = ''; });
+    registros = data;
+    renderTable();
   });
 
-  function mostrarTabla(datos) {
-    const headers = Object.keys(datos[0]);
-    const encabezadoRow = document.getElementById('encabezado');
-    encabezadoRow.innerHTML = '';
-    headers.forEach(campo => { const th = document.createElement('th'); th.textContent = campo; encabezadoRow.appendChild(th); });
-    encabezadoRow.innerHTML += '<th>Abrir</th><th>Script</th><th>Status</th>';
+  document.getElementById('btnDescargar').addEventListener('click', () => {
+    const wb = XLSX.utils.table_to_book(document.getElementById('tabla'), { sheet: 'Registro' });
+    XLSX.writeFile(wb, 'registro_zoom.xlsx');
+  });
 
-    const tbody = document.getElementById('contenido'); tbody.innerHTML = '';
-    datos.forEach(persona => {
-      const fila = document.createElement('tr');
-      headers.forEach(key => { const td = document.createElement('td'); td.textContent = persona[key]; fila.appendChild(td); });
+  function renderTable() {
+    const hdrs = Object.keys(registros[0]);
+    const hrow = document.getElementById('encabezado'); hrow.innerHTML = '';
+    hdrs.forEach(h => { const th = document.createElement('th'); th.textContent = h; hrow.appendChild(th); });
+    hrow.innerHTML += '<th>Abrir</th><th>Script</th>';
 
-      // Botón Abrir: copia al portapapeles y abre URL
-      const tdAbrir = document.createElement('td');
-      const btnAbrir = document.createElement('button');
-      btnAbrir.className = 'btn btn-sm btn-success';
-      btnAbrir.innerHTML = '<i class="bi bi-box-arrow-up-right me-1"></i>Abrir';
-      btnAbrir.onclick = () => copiarYAbrir(persona);
-      tdAbrir.appendChild(btnAbrir); fila.appendChild(tdAbrir);
+    const tb = document.getElementById('contenido'); tb.innerHTML = '';
+    registros.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      hdrs.forEach(h => {
+        const td = document.createElement('td'); td.textContent = p[h];
+        if (h === 'Status') td.id = `status_${i}`;
+        tr.appendChild(td);
+      });
+      // Botón Abrir
+      const tdA = document.createElement('td');
+      tdA.innerHTML = `<button class="btn btn-sm btn-success"><i class="bi bi-box-arrow-up-right me-1"></i>Abrir</button>`;
+      tdA.firstChild.onclick = () => abrirYActualizar(p, i);
+      tr.appendChild(tdA);
+      // Botón Script
+      const tdS = document.createElement('td');
+      tdS.innerHTML = `<button class="btn btn-sm btn-outline-secondary"><i class="bi bi-terminal-fill me-1"></i>Script</button>`;
+      tdS.firstChild.onclick = () => mostrarModal(generarScript(p));
+      tr.appendChild(tdS);
 
-      // Botón Script: muestra modal
-      const tdScript = document.createElement('td');
-      const btnScript = document.createElement('button');
-      btnScript.className = 'btn btn-sm btn-outline-secondary';
-      btnScript.innerHTML = '<i class="bi bi-terminal-fill me-1"></i>Script';
-      btnScript.onclick = () => mostrarModal(generarScript(persona));
-      tdScript.appendChild(btnScript); fila.appendChild(tdScript);
-
-      const tdStatus = document.createElement('td'); tdStatus.id = `status_${persona.Folio}`; fila.appendChild(tdStatus);
-      tbody.appendChild(fila);
+      tb.appendChild(tr);
     });
-
     setTimeout(() => {
       if ($.fn.DataTable.isDataTable('#tabla')) $('#tabla').DataTable().destroy();
       $('#tabla').DataTable({ language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' } });
     }, 100);
   }
 
-  function copiarYAbrir(persona) {
+  function abrirYActualizar(persona, idx) {
     const url = persona.www || persona.URL || persona.url;
-    if (!url) { alert('No se encontró una columna válida con URL.'); return; }
+    if (!url) return alert('No se encontró URL válida.');
     const script = generarScript(persona);
     navigator.clipboard.writeText(script);
     window.open(url, '_blank');
-    const statusCell = document.getElementById(`status_${persona.Folio}`);
-    if (statusCell) {
-      statusCell.textContent = 'Copiado'; statusCell.classList.add('bg-success-subtle', 'text-success');
-    }
+    registros[idx].Status = 'Enviado';
+    const cell = document.getElementById(`status_${idx}`);
+    if (cell) { cell.textContent = 'Enviado'; cell.classList.add('bg-success-subtle','text-success'); }
   }
 
   function generarScript(persona) {
@@ -136,22 +142,21 @@
   const setAndFire = (sel, v) => {
     const e = document.querySelector(sel);
     e.value = v;
-    e.dispatchEvent(new Event('input', { bubbles: true }));
-    e.dispatchEvent(new Event('change', { bubbles: true }));
+    e.dispatchEvent(new Event('input',{ bubbles:true }));
+    e.dispatchEvent(new Event('change',{ bubbles:true }));
   };
   setAndFire('#question_Folio',      '${persona.Folio}');
   setAndFire('#question_first_name', '${persona.Folio}');
-  setAndFire('#question_last_name',  '${persona.Apellido || '-'}');
+  setAndFire('#question_last_name',  '${persona.Apellido||'-'}');
   setAndFire('#question_email',      '${persona.Correo}');
 })();`;
   }
 
   function mostrarModal(script) {
-    let modalEl = document.getElementById('modalScript');
-    if (!modalEl) {
-      // Crear modal al vuelo si no existe
-      const modalHtml = `
-<div class="modal fade" id="modalScript" tabindex="-1" aria-labelledby="modalScriptLabel" aria-hidden="true">
+    let m = document.getElementById('modalScript');
+    if (!m) {
+      document.body.insertAdjacentHTML('beforeend',
+`<div class="modal fade" id="modalScript" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-secondary text-white">
@@ -159,30 +164,25 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <ol class="mb-3">
-          <li>Abre tu pestaña de Zoom</li>
-          <li>Presiona <kbd>F12</kbd> y ve a <strong>Console</strong></li>
-          <li>Pega este script</li>
-        </ol>
+        <ol><li>Abre Zoom</li><li>F12 → Console</li><li>Pega el script</li></ol>
         <pre id="codigoJS" class="bg-light p-3 rounded border"></pre>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline-light" onclick="copiarAlPortapapeles()"><i class="bi bi-clipboard me-1"></i>Copiar</button>
-        <button class="btn btn-primary" data-bs-dismiss="modal"><i class="bi bi-x-lg me-1"></i>Cerrar</button>
+        <button class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
-</div>`;
-      document.body.insertAdjacentHTML('beforeend', modalHtml);
-      modalEl = document.getElementById('modalScript');
+</div>`);
+      m = document.getElementById('modalScript');
     }
     document.getElementById('codigoJS').textContent = script;
-    new bootstrap.Modal(modalEl).show();
+    new bootstrap.Modal(m).show();
   }
 
   function copiarAlPortapapeles() {
-    const texto = document.getElementById('codigoJS').textContent;
-    navigator.clipboard.writeText(texto).then(() => { alert('Código copiado al portapapeles.'); });
+    const t = document.getElementById('codigoJS').textContent;
+    navigator.clipboard.writeText(t).then(() => alert('Código copiado al portapapeles.'));
   }
 </script>
 </body>
