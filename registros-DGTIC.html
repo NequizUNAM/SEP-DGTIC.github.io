@@ -2,78 +2,162 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Formulario Zoom - Automatizador</title>
+  <title>Formulario Zoom con Estado</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    button { padding: 5px 10px; cursor: pointer; }
+    .visitado {
+      color: blue;
+      text-decoration: underline;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
   </style>
 </head>
-<body>
-  <h2>📥 Cargar archivo Excel (datos_zoom.xlsx)</h2>
-  <input type="file" id="input-excel" accept=".xlsx, .xls" />
+<body class="p-4">
+  <h3 class="mb-4">Gestión de Registros de Zoom</h3>
+  <div class="table-responsive">
+    <table id="tabla" class="table table-bordered table-striped">
+      <thead>
+        <tr id="encabezado"></tr>
+      </thead>
+      <tbody id="contenido"></tbody>
+    </table>
+  </div>
 
-  <table id="tabla">
-    <thead>
-      <tr>
-        <th>Folio</th>
-        <th>Apellido</th>
-        <th>Correo</th>
-        <th>URL</th>
-        <th>JS</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <!-- Modal -->
+  <div class="modal fade" id="modalScript" tabindex="-1" aria-labelledby="modalScriptLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalScriptLabel">Instrucciones para llenar el formulario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Pasos:</strong></p>
+          <ol>
+            <li>Ve a la pestaña recién abierta del formulario de Zoom.</li>
+            <li>Presiona <kbd>F12</kbd> o clic derecho → <strong>Inspeccionar</strong>.</li>
+            <li>Abre la pestaña <strong>Console</strong>.</li>
+            <li>Pega el siguiente código y presiona <kbd>Enter</kbd>:</li>
+          </ol>
+          <pre id="codigoJS" class="bg-light p-2 border rounded"></pre>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="copiarAlPortapapeles()">Copiar código</button>
+          <button class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.getElementById('input-excel').addEventListener('change', function (e) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const hoja = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(hoja, { defval: '' });
-
-        const tbody = document.querySelector('#tabla tbody');
-        tbody.innerHTML = '';
-
-        json.forEach((fila, i) => {
-          const tr = document.createElement('tr');
-          const folio = fila['Folio'] || '';
-          const apellido = fila['Apellido'] || '';
-          const correo = fila['Correo'] || '';
-          const url = fila['www'] || '';
-          const js = `
-            document.querySelector('#question_Folio').value = '${folio}';
-            document.querySelector('#question_first_name').value = '${folio}';
-            document.querySelector('#question_last_name').value = '${apellido}';
-            document.querySelector('#question_email').value = '${correo}';
-          `.trim();
-
-          tr.innerHTML = `
-            <td>${folio}</td>
-            <td>${apellido}</td>
-            <td>${correo}</td>
-            <td><a href="${url}" target="_blank">Abrir enlace</a></td>
-            <td><textarea rows="4" cols="40">${js}</textarea></td>
-            <td><button onclick="abrirYCopiar('${url}', \\`${js.replace(/`/g, '\\`')}\\`)"'>Abrir</button></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      };
-      reader.readAsArrayBuffer(e.target.files[0]);
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarDatosDesdeExcel();
     });
 
-    function abrirYCopiar(url, jsCode) {
-      if (!url || !jsCode) return alert('Falta la URL o el JS.');
-      window.open(url, '_blank');
-      navigator.clipboard.writeText(jsCode).then(() => {
-        alert('✅ Código JS copiado al portapapeles. Pega en la consola de la página con Ctrl+V.');
+    async function cargarDatosDesdeExcel() {
+      const response = await fetch('datos_zoom.xlsx');
+      const arrayBuffer = await response.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const datos = XLSX.utils.sheet_to_json(sheet);
+
+      const headers = Object.keys(datos[0]).map(h => h.trim());
+      const encabezadoRow = document.getElementById('encabezado');
+      headers.forEach(campo => {
+        const th = document.createElement('th');
+        th.textContent = campo.charAt(0).toUpperCase() + campo.slice(1);
+        encabezadoRow.appendChild(th);
+      });
+
+      encabezadoRow.innerHTML += '<th>Evento</th><th>Estado</th>';
+
+      const tbody = document.getElementById('contenido');
+      tbody.innerHTML = '';
+
+      datos.forEach(persona => {
+        const fila = document.createElement('tr');
+        headers.forEach(key => {
+          const celda = document.createElement('td');
+          if (key.toLowerCase() === 'url') {
+            const urlTexto = document.createElement('span');
+            urlTexto.textContent = persona[key];
+            urlTexto.className = estadoVisitado(persona[key]) ? 'visitado' : '';
+            urlTexto.id = `url_${persona.Folio}`;
+            celda.appendChild(urlTexto);
+          } else {
+            celda.textContent = persona[key];
+          }
+          fila.appendChild(celda);
+        });
+
+        // Botón Evento
+        const btnCell = document.createElement('td');
+        const boton = document.createElement('button');
+        boton.className = 'btn btn-sm btn-primary';
+        boton.textContent = 'Evento';
+        boton.onclick = () => abrirYllenarFormulario(persona);
+        btnCell.appendChild(boton);
+        fila.appendChild(btnCell);
+
+        // Estado
+        const estadoCell = document.createElement('td');
+        estadoCell.textContent = estadoVisitado(persona.URL) ? 'Visitado' : 'Pendiente';
+        estadoCell.id = `estado_${persona.Folio}`;
+        fila.appendChild(estadoCell);
+
+        tbody.appendChild(fila);
+      });
+    }
+
+    function estadoVisitado(url) {
+      return localStorage.getItem('visitado_' + url) === 'true';
+    }
+
+    async function abrirYllenarFormulario(persona) {
+      const scriptManual = `
+document.querySelector('#question_Folio').value = '${persona.Folio}';
+document.querySelector('#question_first_name').value = '${persona.Folio}';
+document.querySelector('#question_last_name').value = '${persona.Apellido || '-'}';
+document.querySelector('#question_email').value = '${persona.Correo}';`;
+
+      try {
+        const win = window.open(persona.URL, '_blank');
+
+        const interval = setInterval(() => {
+          try {
+            win.eval(scriptManual);
+            clearInterval(interval);
+          } catch (error) {
+            clearInterval(interval);
+            mostrarModal(scriptManual);
+          }
+        }, 500);
+
+        // Marca como visitado en UI
+        localStorage.setItem('visitado_' + persona.URL, 'true');
+        document.getElementById(`estado_${persona.Folio}`).textContent = 'Visitado';
+        document.getElementById(`url_${persona.Folio}`).classList.add('visitado');
+
+      } catch (err) {
+        console.error('Error al abrir y llenar:', err);
+      }
+    }
+
+    function mostrarModal(script) {
+      document.getElementById('codigoJS').textContent = script.trim();
+      const modal = new bootstrap.Modal(document.getElementById('modalScript'));
+      modal.show();
+    }
+
+    function copiarAlPortapapeles() {
+      const texto = document.getElementById('codigoJS').textContent;
+      navigator.clipboard.writeText(texto).then(() => {
+        alert('Código copiado al portapapeles. Ve a la pestaña del formulario y pégalo en la consola.');
       });
     }
   </script>
