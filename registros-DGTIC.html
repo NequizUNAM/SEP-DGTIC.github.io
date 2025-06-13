@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario Zoom - Automatizador</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    button { padding: 5px 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>📥 Cargar archivo Excel (datos_zoom.xlsx)</h2>
+  <input type="file" id="input-excel" accept=".xlsx, .xls" />
+
+  <table id="tabla">
+    <thead>
+      <tr>
+        <th>Folio</th>
+        <th>Apellido</th>
+        <th>Correo</th>
+        <th>URL</th>
+        <th>JS</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    document.getElementById('input-excel').addEventListener('change', function (e) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const hoja = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(hoja, { defval: '' });
+
+        const tbody = document.querySelector('#tabla tbody');
+        tbody.innerHTML = '';
+
+        json.forEach((fila, i) => {
+          const tr = document.createElement('tr');
+          const folio = fila['Folio'] || '';
+          const apellido = fila['Apellido'] || '';
+          const correo = fila['Correo'] || '';
+          const url = fila['www'] || '';
+          const js = `
+            document.querySelector('#question_Folio').value = '${folio}';
+            document.querySelector('#question_first_name').value = '${folio}';
+            document.querySelector('#question_last_name').value = '${apellido}';
+            document.querySelector('#question_email').value = '${correo}';
+          `.trim();
+
+          tr.innerHTML = `
+            <td>${folio}</td>
+            <td>${apellido}</td>
+            <td>${correo}</td>
+            <td><a href="${url}" target="_blank">Abrir enlace</a></td>
+            <td><textarea rows="4" cols="40">${js}</textarea></td>
+            <td><button onclick="abrirYCopiar('${url}', \\`${js.replace(/`/g, '\\`')}\\`)"'>Abrir</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    });
+
+    function abrirYCopiar(url, jsCode) {
+      if (!url || !jsCode) return alert('Falta la URL o el JS.');
+      window.open(url, '_blank');
+      navigator.clipboard.writeText(jsCode).then(() => {
+        alert('✅ Código JS copiado al portapapeles. Pega en la consola de la página con Ctrl+V.');
+      });
+    }
+  </script>
+</body>
+</html>
