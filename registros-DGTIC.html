@@ -60,7 +60,7 @@
     });
 
     async function cargarDatosDesdeExcel() {
-      const response = await fetch('datos_zoom.xlsx');
+      const response = await fetch('Docs/datos_zoom.xlsx');
       const arrayBuffer = await response.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
