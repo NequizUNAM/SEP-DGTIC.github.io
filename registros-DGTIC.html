@@ -28,7 +28,6 @@
 </nav>
 <div class="container py-4">
   <h3 class="text-secondary mb-4"><i class="bi bi-journal-bookmark-fill me-2"></i>Formulario Zoom desde Excel</h3>
-  <!-- Cargar archivo -->
   <div class="card shadow-sm mb-4">
     <div class="card-header bg-primary text-white d-flex align-items-center">
       <i class="bi bi-upload me-2"></i> Cargar archivo Excel
@@ -42,9 +41,7 @@
       <small class="text-muted">Tamaño máximo: 300MB</small>
     </div>
   </div>
-  <!-- Botón de descarga manual -->
   <button id="btnDescargar" class="btn btn-outline-success mb-3"><i class="bi bi-download me-1"></i>Descargar Registros</button>
-  <!-- Tabla -->
   <div class="card shadow-sm">
     <div class="card-body table-responsive">
       <table id="tabla" class="table table-bordered table-striped table-hover align-middle" style="width:100%">
@@ -54,12 +51,10 @@
     </div>
   </div>
 </div>
-<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<!-- Buttons scripts -->
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -68,15 +63,15 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
-
 <script>
 let registros = [];
 let tablaInstancia;
-
+let originalName = 'registros';
 $('#fileInput').on('change', async function() {
   const file = this.files[0];
   if (!file) return;
   if (file.size > 300 * 1024 * 1024) { alert('El archivo excede 300MB.'); this.value = ''; return; }
+  originalName = file.name.replace(/\.xlsx?$/i, '');
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, { type: 'array' });
   const sheet = wb.Sheets[wb.SheetNames[0]];
@@ -84,18 +79,23 @@ $('#fileInput').on('change', async function() {
   registros.forEach(r => { if (!('Status' in r)) r.Status = ''; });
   renderTable();
 });
-
 $('#btnDescargar').on('click', () => {
   const wb = XLSX.utils.table_to_book(document.getElementById('tabla'), { sheet: 'Registro' });
-  XLSX.writeFile(wb, 'registro_zoom.xlsx');
+  const now = new Date();
+  const stamp = now.getFullYear().toString() +
+    ('0'+(now.getMonth()+1)).slice(-2) +
+    ('0'+now.getDate()).slice(-2) + '_' +
+    ('0'+now.getHours()).slice(-2) +
+    ('0'+now.getMinutes()).slice(-2) +
+    ('0'+now.getSeconds()).slice(-2);
+  const filename = `${originalName}_${stamp}.xlsx`;
+  XLSX.writeFile(wb, filename);
 });
-
 function renderTable() {
   const cols = Object.keys(registros[0] || {});
   const thead = $('#encabezado').empty();
   cols.forEach(c => thead.append(`<th>${c}</th>`));
   thead.append('<th>Abrir</th><th>Script</th>');
-
   const tb = $('#contenido').empty();
   registros.forEach((r, i) => {
     const tr = $('<tr/>');
@@ -104,25 +104,70 @@ function renderTable() {
       if (c === 'Status') td.attr('id', `status_${i}`);
       tr.append(td);
     });
-    // Abrir
     const btnA = $('<button class="btn btn-sm btn-success"><i class="bi bi-box-arrow-up-right me-1"></i>Abrir</button>');
     btnA.on('click', () => abrirYActualizar(r, i));
     tr.append($('<td/>').append(btnA));
-    // Script
     const btnS = $('<button class="btn btn-sm btn-outline-secondary"><i class="bi bi-terminal-fill me-1"></i>Script</button>');
     btnS.on('click', () => mostrarModal(generarScript(r)));
     tr.append($('<td/>').append(btnS));
     tb.append(tr);
   });
-
   if (tablaInstancia) tablaInstancia.clear().destroy();
   tablaInstancia = $('#tabla').DataTable({
     dom: 'Bfrtip',
-    buttons: ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis'],
+    buttons: [
+      {
+        extend: 'copyHtml5',
+        exportOptions: { columns: ':not(:last-child):not(:nth-last-child(2))' },
+        title: `${originalName}`
+      },
+      {
+        extend: 'csvHtml5',
+        exportOptions: { columns: ':not(:last-child):not(:nth-last-child(2))' },
+        title: `${originalName}`
+      },
+      {
+        extend: 'excelHtml5',
+        exportOptions: { columns: ':not(:last-child):not(:nth-last-child(2))' },
+        title: `${originalName}`,
+        filename: function () {
+          const now = new Date();
+          const stamp = now.getFullYear().toString() +
+            ('0'+(now.getMonth()+1)).slice(-2) +
+            ('0'+now.getDate()).slice(-2) + '_' +
+            ('0'+now.getHours()).slice(-2) +
+            ('0'+now.getMinutes()).slice(-2) +
+            ('0'+now.getSeconds()).slice(-2);
+          return `${originalName}_${stamp}`;
+        }
+      },
+      {
+        extend: 'pdfHtml5',
+        orientation: 'landscape',
+        pageSize: 'A4',
+        exportOptions: { columns: ':not(:last-child):not(:nth-last-child(2))' },
+        title: `${originalName}`,
+        filename: function () {
+          const now = new Date();
+          const stamp = now.getFullYear().toString() +
+            ('0'+(now.getMonth()+1)).slice(-2) +
+            ('0'+now.getDate()).slice(-2) + '_' +
+            ('0'+now.getHours()).slice(-2) +
+            ('0'+now.getMinutes()).slice(-2) +
+            ('0'+now.getSeconds()).slice(-2);
+          return `${originalName}_${stamp}`;
+        }
+      },
+      {
+        extend: 'print',
+        exportOptions: { columns: ':not(:last-child):not(:nth-last-child(2))' },
+        title: `${originalName}`
+      },
+      'colvis'
+    ],
     language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
   });
 }
-
 function abrirYActualizar(persona, idx) {
   const url = persona.www || persona.URL || persona.url;
   if (!url) return alert('URL inválida');
@@ -132,7 +177,6 @@ function abrirYActualizar(persona, idx) {
   registros[idx].Status = 'Copiado';
   $(`#status_${idx}`).text('Copiado').addClass('bg-success-subtle text-success');
 }
-
 function generarScript(p) {
   return `(() => {
     const setAndFire = (sel, v) => {
@@ -147,33 +191,31 @@ function generarScript(p) {
     setAndFire('#question_email','${p.Correo}');
   })();`;
 }
-
 function mostrarModal(script) {
   if (!$('#modalScript').length) {
-    $('body').append(
-`<div class="modal fade" id="modalScript" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-secondary text-white">
-        <h5 class="modal-title"><i class="bi bi-code-slash me-2"></i>Script para consola</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <ol class="mb-3"><li>Abre Zoom</li><li>F12 → Console</li><li>Pega el script</li></ol>
-        <pre id="codigoJS" class="bg-light p-3 rounded border"></pre>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline-light" onclick="copiarAlPortapapeles()"><i class="bi bi-clipboard me-1"></i>Copiar</button>
-        <button class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-  </div>
-</div>`);
+    $('body').append(`
+      <div class="modal fade" id="modalScript" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+              <h5 class="modal-title"><i class="bi bi-code-slash me-2"></i>Script para consola</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <ol class="mb-3"><li>Abre Zoom</li><li>F12 → Console</li><li>Pega el script</li></ol>
+              <pre id="codigoJS" class="bg-light p-3 rounded border"></pre>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-outline-light" onclick="copiarAlPortapapeles()"><i class="bi bi-clipboard me-1"></i>Copiar</button>
+              <button class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>`);
   }
   $('#codigoJS').text(script);
   new bootstrap.Modal(document.getElementById('modalScript')).show();
 }
-
 function copiarAlPortapapeles() {
   const txt = document.getElementById('codigoJS').textContent;
   navigator.clipboard.writeText(txt).then(() => alert('Código copiado al portapapeles.'));
